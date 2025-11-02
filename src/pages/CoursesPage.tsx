@@ -17,10 +17,27 @@ const CoursesPage = () => {
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
 
   useEffect(() => {
-    getCourses();
-  }, []);
+    console.log('CoursesPage mounted, fetching courses...');
+    const fetchCourses = async () => {
+      const result = await getCourses();
+      console.log('Courses fetched:', result);
+      if (result && result.length > 0) {
+        setFilteredCourses(result);
+      } else {
+        console.log('No courses found, checking localStorage directly');
+        const storedCourses = localStorage.getItem('courses');
+        if (storedCourses) {
+          const parsedCourses = JSON.parse(storedCourses);
+          console.log('Found courses in localStorage:', parsedCourses);
+          setFilteredCourses(parsedCourses);
+        }
+      }
+    };
+    fetchCourses();
+  }, [getCourses]);
 
   useEffect(() => {
+    console.log('Updating filtered courses:', { searchQuery, courses });
     if (searchQuery) {
       setFilteredCourses(
         courses.filter(

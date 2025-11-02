@@ -78,10 +78,16 @@ const DashboardSidebar = () => {
           const Icon = item.icon;
           const isActive = location.pathname.startsWith(item.href);
           
+          // For courses and bundles, use explicit 'role' segment to avoid conflict with id routes
+          const to =
+            item.href === '/courses' || item.href === '/bundles'
+              ? `${item.href}/role/${user?.role}`
+              : `${item.href}/${user?.role}`;
+
           return (
             <Link
               key={item.href}
-              to={`${item.href}/${user?.role}`}
+              to={to}
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                 isActive

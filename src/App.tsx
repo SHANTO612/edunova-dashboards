@@ -77,7 +77,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path=":role" element={<CoursesPage />} />
+              {/* Use explicit 'role' prefix to avoid conflict with course id route */}
+              <Route path="role/:role" element={<CoursesPage />} />
             </Route>
 
             <Route
@@ -99,7 +100,8 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path=":role" element={<BundlesPage />} />
+              {/* Use explicit 'role' prefix to avoid conflict with bundle id route */}
+              <Route path="role/:role" element={<BundlesPage />} />
             </Route>
 
             <Route

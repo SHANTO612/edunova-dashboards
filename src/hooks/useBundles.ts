@@ -1,63 +1,28 @@
 import { useState } from 'react';
 import { Bundle } from '@/components/BundleCard';
-
-const MOCK_BUNDLES: Bundle[] = [
-  {
-    id: '1',
-    title: 'Full Stack Developer Bundle',
-    description: 'Complete path from frontend to backend development',
-    courses: 5,
-    originalPrice: 500,
-    discountedPrice: 300,
-    discount: 40,
-  },
-  {
-    id: '2',
-    title: 'Data Science Master Bundle',
-    description: 'Everything you need to become a data scientist',
-    courses: 6,
-    originalPrice: 600,
-    discountedPrice: 360,
-    discount: 40,
-  },
-  {
-    id: '3',
-    title: 'Mobile Development Bundle',
-    description: 'Build iOS and Android apps from scratch',
-    courses: 4,
-    originalPrice: 400,
-    discountedPrice: 260,
-    discount: 35,
-  },
-  {
-    id: '4',
-    title: 'UI/UX Design Complete Bundle',
-    description: 'Master design thinking and user experience',
-    courses: 7,
-    originalPrice: 550,
-    discountedPrice: 330,
-    discount: 40,
-  },
-  {
-    id: '5',
-    title: 'DevOps Engineer Bundle',
-    description: 'Learn CI/CD, Docker, Kubernetes and cloud platforms',
-    courses: 5,
-    originalPrice: 480,
-    discountedPrice: 312,
-    discount: 35,
-  },
-];
+import { DEMO_BUNDLES } from '@/lib/demoData';
 
 export const useBundles = () => {
-  const [bundles, setBundles] = useState<Bundle[]>(MOCK_BUNDLES);
+  // Load bundles from localStorage if present so dummy data persists across reloads
+  const loadBundles = (): Bundle[] => {
+    try {
+      const raw = localStorage.getItem('bundles');
+      if (raw) return JSON.parse(raw) as Bundle[];
+    } catch (_) {}
+    return DEMO_BUNDLES;
+  };
+
+  const [bundles, setBundles] = useState<Bundle[]>(loadBundles());
   const [loading, setLoading] = useState(false);
 
   const getBundles = async () => {
     setLoading(true);
+    // Load bundles from localStorage or use demo data
+    const loadedBundles = loadBundles();
     await new Promise((resolve) => setTimeout(resolve, 500));
+    setBundles(loadedBundles);
     setLoading(false);
-    return bundles;
+    return loadedBundles;
   };
 
   const getBundleById = async (id: string) => {
@@ -72,9 +37,13 @@ export const useBundles = () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
     const newBundle: Bundle = {
       ...bundleData,
-      id: String(bundles.length + 1),
+      id: String(Date.now()),
     };
-    setBundles([...bundles, newBundle]);
+    const updated = [...bundles, newBundle];
+    setBundles(updated);
+    try {
+      localStorage.setItem('bundles', JSON.stringify(updated));
+    } catch (_) {}
     setLoading(false);
     return newBundle;
   };
@@ -82,18 +51,24 @@ export const useBundles = () => {
   const updateBundle = async (id: string, bundleData: Partial<Bundle>) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    setBundles(
-      bundles.map((bundle) =>
-        bundle.id === id ? { ...bundle, ...bundleData } : bundle
-      )
+    const updated = bundles.map((bundle) =>
+      bundle.id === id ? { ...bundle, ...bundleData } : bundle
     );
+    setBundles(updated);
+    try {
+      localStorage.setItem('bundles', JSON.stringify(updated));
+    } catch (_) {}
     setLoading(false);
   };
 
   const deleteBundle = async (id: string) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    setBundles(bundles.filter((bundle) => bundle.id !== id));
+    const updated = bundles.filter((bundle) => bundle.id !== id);
+    setBundles(updated);
+    try {
+      localStorage.setItem('bundles', JSON.stringify(updated));
+    } catch (_) {}
     setLoading(false);
   };
 

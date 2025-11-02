@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Course } from '@/components/CourseCard';
 
 const MOCK_COURSES: Course[] = [
@@ -62,58 +62,132 @@ const MOCK_COURSES: Course[] = [
     price: 129,
     category: 'Mobile',
   },
+  {
+    id: '7',
+    title: 'Intro to SQL and Databases',
+    description: 'Relational databases, queries and performance basics',
+    instructor: 'Robert King',
+    duration: '4 weeks',
+    students: 412,
+    price: 59,
+    category: 'Data',
+  },
+  {
+    id: '8',
+    title: 'Kubernetes for Developers',
+    description: 'Deploy and manage containerized applications at scale',
+    instructor: 'Nina Patel',
+    duration: '6 weeks',
+    students: 198,
+    price: 129,
+    category: 'DevOps',
+  },
+  {
+    id: '9',
+    title: 'GraphQL APIs',
+    description: 'Design and implement GraphQL servers and clients',
+    instructor: 'Ethan Brooks',
+    duration: '5 weeks',
+    students: 150,
+    price: 89,
+    category: 'Backend',
+  },
+  {
+    id: '10',
+    title: 'Design Systems with Figma',
+    description: 'Create and maintain scalable design systems',
+    instructor: 'Olivia Gomez',
+    duration: '3 weeks',
+    students: 320,
+    price: 49,
+    category: 'Design',
+  },
 ];
 
 export const useCourses = () => {
-  const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
+  const loadCourses = useCallback((): Course[] => {
+    try {
+      const raw = localStorage.getItem('courses');
+      if (raw) return JSON.parse(raw) as Course[];
+    } catch (_) {}
+    return MOCK_COURSES;
+  }, []);
+
+  const [courses, setCourses] = useState<Course[]>(loadCourses());
   const [loading, setLoading] = useState(false);
 
-  const getCourses = async () => {
+  const getCourses = useCallback(async () => {
     setLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setLoading(false);
-    return courses;
-  };
+    try {
+      // Load courses from localStorage or use mock data
+      const loadedCourses = loadCourses();
+      console.log('Loaded courses:', loadedCourses);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setCourses(loadedCourses);
+      return loadedCourses;
+    } catch (error) {
+      console.error('Error loading courses:', error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, [loadCourses]);
 
-  const getCourseById = async (id: string) => {
+  const getCourseById = useCallback(async (id: string) => {
     setLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    setLoading(false);
-    return courses.find((course) => course.id === id);
-  };
+    try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return courses.find((course) => course.id === id) || null;
+    } catch (error) {
+      console.error('Error getting course by id:', error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [courses]);
 
-  const createCourse = async (courseData: Omit<Course, 'id' | 'students'>) => {
+  const createCourse = useCallback(async (courseData: Omit<Course, 'id' | 'students'>) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
     const newCourse: Course = {
       ...courseData,
-      id: String(courses.length + 1),
+      id: String(Date.now()),
       students: 0,
     };
-    setCourses([...courses, newCourse]);
+    const updated = [...courses, newCourse];
+    setCourses(updated);
+    try {
+      localStorage.setItem('courses', JSON.stringify(updated));
+    } catch (_) {}
     setLoading(false);
     return newCourse;
-  };
+  }, [courses]);
 
-  const updateCourse = async (id: string, courseData: Partial<Course>) => {
+  const updateCourse = useCallback(async (id: string, courseData: Partial<Course>) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    setCourses(
-      courses.map((course) =>
-        course.id === id ? { ...course, ...courseData } : course
-      )
+    const updated = courses.map((course) =>
+      course.id === id ? { ...course, ...courseData } : course
     );
+    setCourses(updated);
+    try {
+      localStorage.setItem('courses', JSON.stringify(updated));
+    } catch (_) {}
     setLoading(false);
-  };
+  }, [courses]);
 
-  const deleteCourse = async (id: string) => {
+  const deleteCourse = useCallback(async (id: string) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    setCourses(courses.filter((course) => course.id !== id));
+    const updated = courses.filter((course) => course.id !== id);
+    setCourses(updated);
+    try {
+      localStorage.setItem('courses', JSON.stringify(updated));
+    } catch (_) {}
     setLoading(false);
-  };
+  }, [courses]);
 
   return {
     courses,

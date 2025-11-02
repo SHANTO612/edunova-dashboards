@@ -17,16 +17,32 @@ const CourseDetail = () => {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      if (id) {
-        const courseData = await getCourseById(id);
-        setCourse(courseData || null);
-        setLoading(false);
-      }
-    };
-    fetchCourse();
-  }, [id]);
+    useEffect(() => {
+      let mounted = true;
+
+      const fetchCourse = async () => {
+        if (!id) return;
+        try {
+          const courseData = await getCourseById(id);
+          if (mounted) {
+            setCourse(courseData || null);
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('Error fetching course:', error);
+          if (mounted) {
+            setCourse(null);
+            setLoading(false);
+          }
+        }
+      };
+
+      fetchCourse();
+
+      return () => {
+        mounted = false;
+      };
+    }, [id, getCourseById]);
 
   if (loading) {
     return (
