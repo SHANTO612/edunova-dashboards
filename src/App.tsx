@@ -12,6 +12,13 @@ import DashboardLayout from "./pages/DashboardLayout";
 import EducatorDashboard from "./pages/dashboard/EducatorDashboard";
 import MarketerDashboard from "./pages/dashboard/MarketerDashboard";
 import StudentDashboard from "./pages/dashboard/StudentDashboard";
+import CoursesPage from "./pages/CoursesPage";
+import CourseDetail from "./pages/CourseDetail";
+import BundlesPage from "./pages/BundlesPage";
+import BundleDetail from "./pages/BundleDetail";
+import EducatorAnalytics from "./pages/analytics/EducatorAnalytics";
+import MarketerAnalytics from "./pages/analytics/MarketerAnalytics";
+import StudentAnalytics from "./pages/analytics/StudentAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +67,63 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+            </Route>
+
+            <Route
+              path="/courses"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path=":role" element={<CoursesPage />} />
+            </Route>
+
+            <Route
+              path="/courses/:id"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<CourseDetail />} />
+            </Route>
+
+            <Route
+              path="/bundles"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path=":role" element={<BundlesPage />} />
+            </Route>
+
+            <Route
+              path="/bundles/:id"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<BundleDetail />} />
+            </Route>
+
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="educator" element={<EducatorAnalytics />} />
+              <Route path="marketer" element={<MarketerAnalytics />} />
+              <Route path="student" element={<StudentAnalytics />} />
             </Route>
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

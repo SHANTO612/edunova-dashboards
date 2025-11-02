@@ -41,7 +41,7 @@ const Index = () => {
             <GraduationCap className="h-20 w-20 text-primary" />
           </div>
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            AI-Powered EdTech Platform
+            SynapseX - AI-Powered EdTech Platform
           </h1>
           <p className="text-xl text-muted-foreground mb-8">
             Transform the way you teach, market, and learn with intelligent course management

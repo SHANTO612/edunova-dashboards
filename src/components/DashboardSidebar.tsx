@@ -41,7 +41,7 @@ const navItems: NavItem[] = [
     title: 'Analytics',
     href: '/analytics',
     icon: BarChart3,
-    roles: ['educator', 'marketer'],
+    roles: ['educator', 'marketer', 'student'],
   },
   {
     title: 'AI Suggestions',

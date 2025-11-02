@@ -20,7 +20,7 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl text-primary">
             <GraduationCap className="h-8 w-8" />
-            <span>EduAI Platform</span>
+            <span>SynapseX</span>
           </Link>
 
           {isAuthenticated ? (

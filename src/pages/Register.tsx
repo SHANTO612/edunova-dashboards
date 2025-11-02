@@ -50,7 +50,7 @@ const Register = () => {
           <div className="flex justify-center mb-4">
             <div className="flex items-center gap-2 text-primary">
               <GraduationCap className="h-10 w-10" />
-              <span className="text-2xl font-bold">EduAI Platform</span>
+              <span className="text-2xl font-bold">SynapseX</span>
             </div>
           </div>
           <CardTitle className="text-2xl">Create an account</CardTitle>
