@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { PurchasesProvider } from "@/contexts/PurchasesContext";
 import { ReviewsProvider } from "@/contexts/ReviewsContext";
 import { ChatbotProvider } from "@/contexts/ChatbotContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -23,6 +24,8 @@ import EducatorAnalytics from "./pages/analytics/EducatorAnalytics";
 import MarketerAnalytics from "./pages/analytics/MarketerAnalytics";
 import StudentAnalytics from "./pages/analytics/StudentAnalytics";
 import StudentPurchases from "./pages/purchases/StudentPurchases";
+import StudentsPage from "./pages/StudentsPage";
+import AISuggestionsPage from "./pages/AISuggestionsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,10 +36,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <PurchasesProvider>
-            <ReviewsProvider>
-              <ChatbotProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <PurchasesProvider>
+              <ReviewsProvider>
+                <ChatbotProvider>
               <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
@@ -123,6 +127,32 @@ const App = () => (
             </Route>
 
             <Route
+              path="/students"
+              element={
+                <ProtectedRoute allowedRoles={['educator', 'marketer']}>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<StudentsPage />} />
+              <Route path="educator" element={<StudentsPage />} />
+            </Route>
+            
+            <Route
+              path="/ai-suggestions"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AISuggestionsPage />} />
+              <Route path="educator" element={<AISuggestionsPage />} />
+              <Route path="student" element={<AISuggestionsPage />} />
+              <Route path="teacher" element={<AISuggestionsPage />} />
+            </Route>
+
+            <Route
               path="/analytics"
               element={
                 <ProtectedRoute>
@@ -153,13 +183,14 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-            </ChatbotProvider>
-        </ReviewsProvider>
-      </PurchasesProvider>
-    </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+              </ChatbotProvider>
+            </ReviewsProvider>
+          </PurchasesProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  </TooltipProvider>
+</QueryClientProvider>
 );
 
 export default App;

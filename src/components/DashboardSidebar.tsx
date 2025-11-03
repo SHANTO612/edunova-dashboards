@@ -7,10 +7,13 @@ import {
   Sparkles,
   Users,
   ShoppingCart,
+  LogOut
 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { useChatbot } from '@/contexts/ChatbotContext';
+import { useContext } from 'react';
+import { ThemeToggle } from './ThemeToggle';
 
 interface NavItem {
   title: string;
@@ -65,9 +68,12 @@ const navItems: NavItem[] = [
 ];
 
 const DashboardSidebar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
-  const { openChatbot } = useChatbot();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   const filteredItems = navItems.filter((item) =>
     user?.role ? item.roles.includes(user.role) : false
@@ -84,20 +90,12 @@ const DashboardSidebar = () => {
           const to =
             item.href === '/courses' || item.href === '/bundles'
               ? `${item.href}/role/${user?.role}`
-              : item.href === '/ai-suggestions'
-                ? '#' // Use # for AI Suggestions to prevent navigation
-                : `${item.href}/${user?.role}`;
+              : `${item.href}/${user?.role}`;
 
           return (
             <Link
               key={item.href}
               to={to}
-              onClick={(e) => {
-                if (item.href === '/ai-suggestions') {
-                  e.preventDefault();
-                  openChatbot();
-                }
-              }}
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                 isActive
@@ -111,6 +109,16 @@ const DashboardSidebar = () => {
           );
         })}
       </nav>
+      <div className="mt-auto p-4 space-y-2">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium">Theme</span>
+          <ThemeToggle />
+        </div>
+        <Button variant="outline" className="w-full" onClick={handleLogout}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
+        </Button>
+      </div>
     </aside>
   );
 };

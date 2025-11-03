@@ -22,22 +22,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  // Load user from localStorage on mount
+  
+  // Check for existing user session on load
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     
     if (storedUser && token) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
       } catch (error) {
-        console.error('Error parsing stored user:', error);
+        console.error('Failed to parse stored user:', error);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
       }
     }
+    
+    setLoading(false);
   }, []);
 
   // Seed demo data
@@ -124,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: !!user }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

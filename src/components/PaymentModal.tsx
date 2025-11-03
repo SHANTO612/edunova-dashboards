@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Course } from '@/components/CourseCard';
+import { Course } from '@/types/course';
 import { Bundle } from '@/components/BundleCard';
 import { CreditCard, Smartphone } from 'lucide-react';
 
