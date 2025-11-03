@@ -5,8 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCourses } from '@/hooks/useCourses';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import CourseCard, { Course } from '@/components/CourseCard';
-import CreateCourseModal from '@/components/modals/CreateCourseModal';
+import { Course } from '@/types/course';
+import CourseCard from '@/components/CourseCard';
+import CourseContentModal from '@/components/modals/CourseContentModal';
 
 const CoursesPage = () => {
   const navigate = useNavigate();
@@ -121,7 +122,7 @@ const CoursesPage = () => {
         </div>
       )}
 
-      <CreateCourseModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
+      <CourseContentModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
     </div>
   );
 };

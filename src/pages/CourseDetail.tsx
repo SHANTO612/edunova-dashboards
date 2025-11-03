@@ -1,21 +1,35 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Clock, Users, Award } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, Users, Award, Video } from 'lucide-react';
 import { useCourses } from '@/hooks/useCourses';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePurchases } from '@/contexts/PurchasesContext';
+import { useReviews } from '@/contexts/ReviewsContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Course } from '@/components/CourseCard';
+import { Course } from '@/types/course';
+import { useToast } from '@/hooks/use-toast';
+import ReviewForm from '@/components/ReviewForm';
+import ReviewsList from '@/components/ReviewsList';
+import PaymentModal from '@/components/PaymentModal';
+import CourseContentModal from '@/components/modals/CourseContentModal';
+
+
 
 const CourseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { getCourseById } = useCourses();
+  const { enrollInCourse, isEnrolled } = usePurchases();
+  const { getUserReview } = useReviews();
+  const { toast } = useToast();
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
     useEffect(() => {
       let mounted = true;
@@ -63,6 +77,24 @@ const CourseDetail = () => {
       </div>
     );
   }
+
+  const handleEnrollClick = () => {
+    if (isEnrolled(course.id)) {
+      navigate('/purchases/student');
+    } else {
+      setShowPaymentModal(true);
+    }
+  };
+
+  const handlePaymentComplete = () => {
+    enrollInCourse(course);
+    toast({
+      title: "Enrollment Successful",
+      description: `You have successfully enrolled in ${course.title}`,
+    });
+    navigate('/purchases/student');
+    setShowPaymentModal(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -123,14 +155,29 @@ const CourseDetail = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {[1, 2, 3, 4].map((module) => (
-                      <div key={module} className="p-4 border rounded-lg">
-                        <h4 className="font-medium mb-2">Module {module}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          5 lessons • 2 hours
-                        </p>
+                    {course.modules && course.modules.length > 0 ? (
+                      course.modules.map((module) => (
+                        <div key={module.id} className="p-4 border rounded-lg">
+                          <h4 className="font-medium mb-2">{module.title}</h4>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {module.description}
+                          </p>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            <span>{module.duration}</span>
+                            {module.videoUploaded && (
+                              <span className="flex items-center gap-1">
+                                • <Video className="h-4 w-4" /> Video available
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-6 text-muted-foreground">
+                        No modules available for this course.
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -141,7 +188,20 @@ const CourseDetail = () => {
                   <CardTitle>Student Reviews</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">No reviews yet</p>
+                  <ReviewsList courseId={course.id} />
+                  
+                  {isEnrolled(course.id) && (
+                    <div className="mt-8 border-t pt-6">
+                      <h4 className="font-medium mb-4">Write a Review</h4>
+                      <ReviewForm 
+                        courseId={course.id} 
+                        onReviewSubmitted={() => {
+                          // Force re-render
+                          setCourse({...course});
+                        }}
+                      />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -156,9 +216,24 @@ const CourseDetail = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {user?.role === 'student' && (
-                <Button className="w-full" size="lg">
-                  Enroll Now
-                </Button>
+                isEnrolled(course.id) ? (
+                  <Button 
+                    className="w-full" 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => navigate('/purchases/student')}
+                  >
+                    View My Courses
+                  </Button>
+                ) : (
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={handleEnrollClick}
+                  >
+                    Enroll Now
+                  </Button>
+                )
               )}
               {user?.role === 'marketer' && (
                 <Button className="w-full" size="lg">
@@ -166,7 +241,12 @@ const CourseDetail = () => {
                 </Button>
               )}
               {user?.role === 'educator' && (
-                <Button className="w-full" size="lg" variant="outline">
+                <Button 
+                  className="w-full" 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => setShowEditModal(true)}
+                >
                   Edit Course
                 </Button>
               )}
@@ -203,6 +283,31 @@ const CourseDetail = () => {
           </Card>
         </div>
       </div>
+      
+      {showPaymentModal && (
+        <PaymentModal
+          open={showPaymentModal}
+          onOpenChange={setShowPaymentModal}
+          item={course}
+          itemType="course"
+          onPaymentComplete={handlePaymentComplete}
+        />
+      )}
+      
+      <CourseContentModal 
+        open={showEditModal} 
+        onOpenChange={async (open) => {
+          setShowEditModal(open);
+          if (!open) {
+            // Refresh course data when modal closes
+            if (id) {
+              const refreshedCourse = await getCourseById(id);
+              setCourse(refreshedCourse);
+            }
+          }
+        }} 
+        editCourse={course} 
+      />
     </div>
   );
 };

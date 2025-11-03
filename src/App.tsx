@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PurchasesProvider } from "@/contexts/PurchasesContext";
+import { ReviewsProvider } from "@/contexts/ReviewsContext";
+import { ChatbotProvider } from "@/contexts/ChatbotContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -19,6 +22,7 @@ import BundleDetail from "./pages/BundleDetail";
 import EducatorAnalytics from "./pages/analytics/EducatorAnalytics";
 import MarketerAnalytics from "./pages/analytics/MarketerAnalytics";
 import StudentAnalytics from "./pages/analytics/StudentAnalytics";
+import StudentPurchases from "./pages/purchases/StudentPurchases";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,7 +34,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <PurchasesProvider>
+            <ReviewsProvider>
+              <ChatbotProvider>
+              <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -128,10 +135,28 @@ const App = () => (
               <Route path="student" element={<StudentAnalytics />} />
             </Route>
 
+            <Route
+              path="/purchases"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="student" element={
+                <ProtectedRoute allowedRoles={['student']}>
+                  <StudentPurchases />
+                </ProtectedRoute>
+              } />
+            </Route>
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
+            </ChatbotProvider>
+        </ReviewsProvider>
+      </PurchasesProvider>
+    </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

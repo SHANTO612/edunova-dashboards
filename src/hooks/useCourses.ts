@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Course } from '@/components/CourseCard';
+import { Course, CourseDataToSave } from '@/types/course';
 
 const MOCK_COURSES: Course[] = [
   {
@@ -109,7 +109,9 @@ export const useCourses = () => {
     try {
       const raw = localStorage.getItem('courses');
       if (raw) return JSON.parse(raw) as Course[];
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error loading courses from localStorage:', error);
+    }
     return MOCK_COURSES;
   }, []);
 
@@ -148,11 +150,29 @@ export const useCourses = () => {
     }
   }, [courses]);
 
-  const createCourse = useCallback(async (courseData: Omit<Course, 'id' | 'students'>) => {
+
+
+  // Helper function to sanitize course data before saving
+  const sanitizeCourseData = useCallback((data: CourseDataToSave): CourseDataToSave => {
+    console.log('Sanitizing course data:', data);
+    const sanitized = { 
+      ...data,
+      modules: data.modules ? data.modules.map(module => ({
+        ...module,
+        id: module.id || String(Date.now() + Math.random()),
+        video: null, // Remove File objects before storing
+        videoPreview: module.videoPreview || null
+      })) : []
+    };
+    console.log('Sanitized data:', sanitized);
+    return sanitized;
+  }, []);
+
+  const createCourse = useCallback(async (courseData: CourseDataToSave) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
     const newCourse: Course = {
-      ...courseData,
+      ...sanitizeCourseData(courseData),
       id: String(Date.now()),
       students: 0,
     };
@@ -160,33 +180,81 @@ export const useCourses = () => {
     setCourses(updated);
     try {
       localStorage.setItem('courses', JSON.stringify(updated));
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
     setLoading(false);
     return newCourse;
-  }, [courses]);
+  }, [courses, sanitizeCourseData]);
 
-  const updateCourse = useCallback(async (id: string, courseData: Partial<Course>) => {
+  const updateCourse = useCallback(async (id: string, courseData: Partial<CourseDataToSave>) => {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // Find existing course
+    const existingCourse = courses.find(course => course.id === id);
+    if (!existingCourse) {
+      throw new Error(`Course with id ${id} not found`);
+    }
+
+    console.log('Updating course:', id);
+    console.log('Existing course:', existingCourse);
+    console.log('Update data:', courseData);
+
+    // Merge existing data with updates
+    const mergedData: CourseDataToSave = {
+      title: courseData.title ?? existingCourse.title,
+      description: courseData.description ?? existingCourse.description,
+      category: courseData.category ?? existingCourse.category,
+      price: courseData.price ?? existingCourse.price,
+      duration: courseData.duration ?? existingCourse.duration,
+      instructor: courseData.instructor ?? existingCourse.instructor,
+      instructorBio: courseData.instructorBio ?? existingCourse.instructorBio,
+      modules: Array.isArray(courseData.modules) ? courseData.modules : (existingCourse.modules || [])
+    };
+
+    // Sanitize the merged data
+    const sanitizedData = sanitizeCourseData(mergedData);
+    
+    // Create the final updated course
+    const updatedCourse: Course = {
+      ...sanitizedData,
+      id: existingCourse.id,
+      students: existingCourse.students
+    };
+
+    console.log('Final updated course:', updatedCourse);
+    
     const updated = courses.map((course) =>
-      course.id === id ? { ...course, ...courseData } : course
+      course.id === id ? updatedCourse : course
     );
+    
     setCourses(updated);
     try {
       localStorage.setItem('courses', JSON.stringify(updated));
-    } catch (_) {}
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
     setLoading(false);
-  }, [courses]);
+  }, [courses, sanitizeCourseData]);
 
   const deleteCourse = useCallback(async (id: string) => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    const updated = courses.filter((course) => course.id !== id);
-    setCourses(updated);
     try {
-      localStorage.setItem('courses', JSON.stringify(updated));
-    } catch (_) {}
-    setLoading(false);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const updated = courses.filter((course) => course.id !== id);
+      setCourses(updated);
+      try {
+        localStorage.setItem('courses', JSON.stringify(updated));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }, [courses]);
 
   return {

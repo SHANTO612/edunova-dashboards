@@ -1,9 +1,21 @@
-import { BookOpen, Users, DollarSign, TrendingUp } from 'lucide-react';
+import { BookOpen, Users, DollarSign, TrendingUp, Upload, Video, Edit, Wand2, FileText } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
+import { Progress } from '@/components/ui/progress';
+import CourseContentModal from '@/components/modals/CourseContentModal';
 
 const EducatorDashboard = () => {
+  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   // Mock data - replace with actual API calls
   const stats = [
     {
@@ -38,6 +50,7 @@ const EducatorDashboard = () => {
     { id: '3', title: 'Node.js Backend Development', students: 167, revenue: 3340 },
   ];
 
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -47,7 +60,11 @@ const EducatorDashboard = () => {
             Manage your courses and track your teaching impact
           </p>
         </div>
-        <Button>Create New Course</Button>
+        <Button onClick={() => setIsContentModalOpen(true)}>Create New Course</Button>
+        <CourseContentModal 
+          open={isContentModalOpen} 
+          onOpenChange={setIsContentModalOpen} 
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { useChatbot } from '@/contexts/ChatbotContext';
 
 interface NavItem {
   title: string;
@@ -47,7 +48,7 @@ const navItems: NavItem[] = [
     title: 'AI Suggestions',
     href: '/ai-suggestions',
     icon: Sparkles,
-    roles: ['educator', 'marketer'],
+    roles: ['student','educator', 'marketer'],
   },
   {
     title: 'Students',
@@ -66,6 +67,7 @@ const navItems: NavItem[] = [
 const DashboardSidebar = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const { openChatbot } = useChatbot();
 
   const filteredItems = navItems.filter((item) =>
     user?.role ? item.roles.includes(user.role) : false
@@ -82,12 +84,20 @@ const DashboardSidebar = () => {
           const to =
             item.href === '/courses' || item.href === '/bundles'
               ? `${item.href}/role/${user?.role}`
-              : `${item.href}/${user?.role}`;
+              : item.href === '/ai-suggestions'
+                ? '#' // Use # for AI Suggestions to prevent navigation
+                : `${item.href}/${user?.role}`;
 
           return (
             <Link
               key={item.href}
               to={to}
+              onClick={(e) => {
+                if (item.href === '/ai-suggestions') {
+                  e.preventDefault();
+                  openChatbot();
+                }
+              }}
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
                 isActive

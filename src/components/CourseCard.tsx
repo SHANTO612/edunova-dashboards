@@ -3,17 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Clock, Users } from 'lucide-react';
 
-export interface Course {
-  id: string;
-  title: string;
-  description: string;
-  instructor: string;
-  duration: string;
-  students: number;
-  price: number;
-  category: string;
-  thumbnail?: string;
-}
+import { Course } from '@/types/course';
 
 interface CourseCardProps {
   course: Course;

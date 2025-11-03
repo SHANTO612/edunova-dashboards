@@ -1,20 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Package, BookOpen, Percent } from 'lucide-react';
+import { ArrowLeft, Package, BookOpen, Percent, Check, Star } from 'lucide-react';
 import { useBundles } from '@/hooks/useBundles';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePurchases } from '@/contexts/PurchasesContext';
+import { useReviews } from '@/contexts/ReviewsContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bundle } from '@/components/BundleCard';
+import { toast } from '@/components/ui/use-toast';
+import PaymentModal from '@/components/PaymentModal';
+import ReviewForm from '@/components/ReviewForm';
+import ReviewsList from '@/components/ReviewsList';
 
 const BundleDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { getBundleById } = useBundles();
+  const { purchaseBundle, isBundlePurchased } = usePurchases();
+  const { getCourseReviews, getAverageRating } = useReviews();
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     const fetchBundle = async () => {
@@ -76,47 +88,136 @@ const BundleDetail = () => {
             </CardHeader>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Included Courses</CardTitle>
-              <CardDescription>
-                This bundle includes {bundle.courses} premium courses
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {Array.from({ length: bundle.courses }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-4 border rounded-lg hover:bg-secondary/50 transition-colors"
-                  >
-                    <BookOpen className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Course {index + 1}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Full access included
-                      </p>
-                    </div>
+          <Tabs defaultValue="overview" className="space-y-4" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-4">
+              <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
+              <TabsTrigger value="courses" className="flex-1">Courses</TabsTrigger>
+              <TabsTrigger value="progress" className="flex-1">Progress</TabsTrigger>
+              <TabsTrigger value="reviews" className="flex-1">Reviews</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>What you'll get</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 list-disc list-inside">
+                    <li>Access to all {bundle.courses} courses</li>
+                    <li>Lifetime access to course content</li>
+                    <li>Certificates for each course</li>
+                    <li>Priority support</li>
+                    <li>Exclusive community access</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="courses" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Included Courses</CardTitle>
+                  <CardDescription>
+                    This bundle includes {bundle.courses} premium courses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {Array.from({ length: bundle.courses }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 p-4 border rounded-lg hover:bg-secondary/50 transition-colors"
+                      >
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        <div>
+                          <p className="font-medium">Course {index + 1}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Full access included
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>What you'll get</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 list-disc list-inside">
-                <li>Access to all {bundle.courses} courses</li>
-                <li>Lifetime access to course content</li>
-                <li>Certificates for each course</li>
-                <li>Priority support</li>
-                <li>Exclusive community access</li>
-              </ul>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="progress" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Progress</CardTitle>
+                  <CardDescription>Track your learning journey</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Array.from({ length: bundle.courses }).map((_, index) => {
+                      // Calculate random progress for demo purposes
+                      const progress = Math.floor(Math.random() * 100);
+                      return (
+                        <div key={index} className="space-y-2">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="font-medium">Course {index + 1}</h4>
+                            <span className="text-sm font-medium text-primary">
+                              {progress}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                          
+                          {/* Module slots */}
+                          <div className="mt-3 space-y-2">
+                            {Array.from({ length: 4 }).map((_, moduleIndex) => {
+                              const moduleProgress = Math.min(100, progress + (moduleIndex * 10) - 20);
+                              const isCompleted = moduleProgress >= 100;
+                              return (
+                                <div key={moduleIndex} className="flex items-center gap-2">
+                                  <div className={`w-4 h-4 rounded-full flex items-center justify-center ${isCompleted ? 'bg-green-500' : 'border border-gray-300'}`}>
+                                    {isCompleted && <Check className="h-3 w-3 text-white" />}
+                                  </div>
+                                  <span className="text-sm">Module {moduleIndex + 1}</span>
+                                  {isCompleted && <span className="text-xs text-green-500 ml-auto">Completed</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="reviews" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Student Reviews</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {id && <ReviewsList courseId={id} />}
+                  
+                  {id && isBundlePurchased(id) && (
+                    <div className="mt-8 border-t pt-6">
+                      <h4 className="font-medium mb-4">Write a Review</h4>
+                      <ReviewForm 
+                        courseId={id} 
+                        onReviewSubmitted={() => {
+                          // Force re-render
+                          if (bundle) {
+                            setBundle({...bundle});
+                          }
+                        }}
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
 
         <div className="space-y-6">
@@ -136,9 +237,20 @@ const BundleDetail = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {user?.role === 'student' && (
-                <Button className="w-full bg-accent hover:bg-accent/90" size="lg">
-                  Purchase Bundle
-                </Button>
+                isBundlePurchased(bundle.id) ? (
+                  <Button className="w-full bg-green-600 hover:bg-green-700" size="lg" disabled>
+                    <Check className="mr-2 h-4 w-4" /> Purchased
+                  </Button>
+                ) : (
+                  <Button 
+                    className="w-full bg-accent hover:bg-accent/90" 
+                    size="lg"
+                    onClick={() => setShowPaymentModal(true)}
+                    disabled={isPurchasing}
+                  >
+                    Purchase Bundle
+                  </Button>
+                )
               )}
               {user?.role === 'marketer' && (
                 <Button className="w-full bg-accent hover:bg-accent/90" size="lg" variant="outline">
@@ -179,6 +291,27 @@ const BundleDetail = () => {
           </Card>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      {bundle && (
+        <PaymentModal
+          open={showPaymentModal}
+          onOpenChange={setShowPaymentModal}
+          item={bundle}
+          itemType="bundle"
+          onPaymentComplete={() => {
+            setIsPurchasing(true);
+            setTimeout(() => {
+              purchaseBundle(bundle);
+              setIsPurchasing(false);
+              toast({
+                title: "Bundle purchased!",
+                description: `You now have access to ${bundle.title}`,
+              });
+            }, 1000);
+          }}
+        />
+      )}
     </div>
   );
 };
