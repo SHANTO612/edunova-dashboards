@@ -1,11 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
-export interface Review {
+interface Review {
   id: string;
-  courseId: string;
   userId: string;
   userName: string;
+  courseId: string;
   rating: number;
   comment: string;
   date: string;
@@ -13,91 +12,83 @@ export interface Review {
 
 interface ReviewsContextType {
   reviews: Review[];
-  addReview: (review: Omit<Review, 'id' | 'userId' | 'userName' | 'date'>) => void;
+  addReview: (review: Omit<Review, 'id' | 'date'>) => void;
+  getUserReview: (userId: string, courseId: string) => Review | undefined;
   getCourseReviews: (courseId: string) => Review[];
-  getUserReview: (courseId: string, userId: string) => Review | undefined;
-  getAverageRating: (courseId: string) => number;
 }
 
 const ReviewsContext = createContext<ReviewsContextType | undefined>(undefined);
 
-export const useReviews = () => {
-  const context = useContext(ReviewsContext);
-  if (!context) {
-    throw new Error('useReviews must be used within a ReviewsProvider');
-  }
-  return context;
-};
+// Sample reviews data
+const initialReviews: Review[] = [
+  {
+    id: '1',
+    userId: 'user1',
+    userName: 'John Doe',
+    courseId: '1',
+    rating: 5,
+    comment: 'Excellent course! I learned a lot about React patterns.',
+    date: '2023-10-15',
+  },
+  {
+    id: '2',
+    userId: 'user2',
+    userName: 'Jane Smith',
+    courseId: '1',
+    rating: 4,
+    comment: 'Very informative content, but could use more examples.',
+    date: '2023-10-10',
+  },
+  {
+    id: '3',
+    userId: 'user3',
+    userName: 'Mike Johnson',
+    courseId: '2',
+    rating: 5,
+    comment: 'The TypeScript explanations were clear and concise.',
+    date: '2023-09-28',
+  },
+];
 
-interface ReviewsProviderProps {
-  children: ReactNode;
-}
+export const ReviewsProvider = ({ children }: { children: ReactNode }) => {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
 
-export const ReviewsProvider = ({ children }: ReviewsProviderProps) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const { user } = useAuth();
-
-  // Load reviews from localStorage on mount
-  useEffect(() => {
-    try {
-      const storedReviews = localStorage.getItem('course_reviews');
-      if (storedReviews) {
-        setReviews(JSON.parse(storedReviews));
-      }
-    } catch (error) {
-      console.error('Error loading reviews:', error);
-    }
-  }, []);
-
-  // Save reviews to localStorage whenever they change
-  useEffect(() => {
-    if (reviews.length > 0) {
-      try {
-        localStorage.setItem('course_reviews', JSON.stringify(reviews));
-      } catch (error) {
-        console.error('Error saving reviews:', error);
-      }
-    }
-  }, [reviews]);
-
-  const addReview = (reviewData: Omit<Review, 'id' | 'userId' | 'userName' | 'date'>) => {
-    if (!user) return;
-    
+  const addReview = (reviewData: Omit<Review, 'id' | 'date'>) => {
     const newReview: Review = {
       ...reviewData,
-      id: Date.now().toString(),
-      userId: user.id,
-      userName: user.name,
-      date: new Date().toISOString(),
+      id: `review-${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
     };
 
-    // Remove existing review by this user for this course if it exists
-    const filteredReviews = reviews.filter(
-      (r) => !(r.courseId === reviewData.courseId && r.userId === user.id)
-    );
+    setReviews((prevReviews) => [...prevReviews, newReview]);
+  };
 
-    setReviews([...filteredReviews, newReview]);
+  const getUserReview = (userId: string, courseId: string) => {
+    return reviews.find((review) => review.userId === userId && review.courseId === courseId);
   };
 
   const getCourseReviews = (courseId: string) => {
     return reviews.filter((review) => review.courseId === courseId);
   };
 
-  const getUserReview = (courseId: string, userId: string) => {
-    return reviews.find((review) => review.courseId === courseId && review.userId === userId);
-  };
-
-  const getAverageRating = (courseId: string) => {
-    const courseReviews = getCourseReviews(courseId);
-    if (courseReviews.length === 0) return 0;
-    
-    const sum = courseReviews.reduce((acc, review) => acc + review.rating, 0);
-    return sum / courseReviews.length;
-  };
-
   return (
-    <ReviewsContext.Provider value={{ reviews, addReview, getCourseReviews, getUserReview, getAverageRating }}>
+    <ReviewsContext.Provider
+      value={{
+        reviews,
+        addReview,
+        getUserReview,
+        getCourseReviews,
+      }}
+    >
       {children}
     </ReviewsContext.Provider>
   );
+};
+
+export const useReviews = () => {
+  const context = useContext(ReviewsContext);
+  if (context === undefined) {
+    throw new Error('useReviews must be used within a ReviewsProvider');
+  }
+  return context;
 };

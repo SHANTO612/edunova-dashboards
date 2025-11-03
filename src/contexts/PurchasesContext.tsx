@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Course } from '@/components/CourseCard';
+import { Course } from '@/types/course';
 import { Bundle } from '@/components/BundleCard';
 import { useAuth } from './AuthContext';
 
@@ -63,7 +63,7 @@ export const PurchasesProvider = ({ children }: PurchasesProviderProps) => {
 
   // Save purchased bundles to localStorage whenever they change
   useEffect(() => {
-    if (user && purchasedBundles.length >= 0) {
+    if (user && purchasedBundles.length > 0) {
       try {
         localStorage.setItem(`purchasedBundles_${user.id}`, JSON.stringify(purchasedBundles));
       } catch (error) {

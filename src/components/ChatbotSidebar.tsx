@@ -111,7 +111,7 @@ const ChatbotSidebar = () => {
                 className={`px-3 py-2 max-w-[80%] ${
                   message.sender === 'user'
                     ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
+                    : 'bg-card shadow-sm'
                 }`}
               >
                 <div dangerouslySetInnerHTML={{ __html: message.content }} />
