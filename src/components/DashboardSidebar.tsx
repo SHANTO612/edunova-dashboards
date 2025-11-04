@@ -6,6 +6,7 @@ import {
   BarChart3,
   Sparkles,
   Users,
+  Handshake,
   ShoppingCart,
   LogOut
 } from 'lucide-react';
@@ -52,6 +53,12 @@ const navItems: NavItem[] = [
     href: '/ai-suggestions',
     icon: Sparkles,
     roles: ['student','educator', 'marketer'],
+  },
+  {
+    title: 'Collaborate',
+    href: '/collaborate',
+    icon: Handshake,
+    roles: ['educator'],
   },
   {
     title: 'Students',

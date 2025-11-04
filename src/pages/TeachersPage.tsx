@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search } from 'lucide-react';
 
@@ -35,6 +36,11 @@ const TeachersPage = () => {
 
     fetchTeachers();
   }, []);
+
+  const handleInvite = (teacher: Teacher) => {
+    alert(`Invitation sent to ${teacher.name} (${teacher.email})`);
+    // 🔹 Later: replace alert with actual invite logic (API call, modal, etc.)
+  };
 
   const filteredTeachers = teachers.filter((t) =>
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,6 +80,7 @@ const TeachersPage = () => {
                     <th className="text-left p-3">Name</th>
                     <th className="text-left p-3">Email</th>
                     <th className="text-left p-3">Specialization</th>
+                    <th className="text-left p-3">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -83,11 +90,20 @@ const TeachersPage = () => {
                         <td className="p-3">{t.name}</td>
                         <td className="p-3">{t.email}</td>
                         <td className="p-3">{t.specialization}</td>
+                        <td className="p-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleInvite(t)}
+                          >
+                            Invite
+                          </Button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={3} className="text-center p-6">
+                      <td colSpan={4} className="text-center p-6">
                         No teachers found matching your search.
                       </td>
                     </tr>
@@ -103,5 +119,3 @@ const TeachersPage = () => {
 };
 
 export default TeachersPage;
-
-
