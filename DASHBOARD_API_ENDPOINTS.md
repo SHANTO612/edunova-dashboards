@@ -283,6 +283,85 @@ This document maps each functionality in the Educator, Student, and Marketer das
 
 ---
 
+## 🤝 COLLABORATION API ENDPOINTS
+
+### Collaborate Page (`/collaborate/educator`)
+
+#### 1. Get Discoverable Marketers
+**Functionality:** List marketers for discovery with search
+- **Endpoint:** `GET /api/collaboration/marketers?search=query&page=1&limit=20`
+- **Response:** Paginated list of marketers `{ id, name, specialization, videosProduced, rating }`
+
+#### 2. Get Incoming Invitations
+**Functionality:** Fetch invitations sent by marketers to the educator
+- **Endpoint:** `GET /api/collaboration/invitations?role=educator`
+- **Response:**
+```json
+[
+  { "id": "inv-1", "marketerId": "m1", "marketerName": "Media Maven Co.", "status": "pending" }
+]
+```
+
+#### 3. Accept Invitation
+**Functionality:** Accept marketer invitation and create a connection
+- **Endpoint:** `POST /api/collaboration/invitations/:invitationId/accept`
+- **Response:** Connection object `{ id, marketerId, educatorId, createdAt }`
+
+#### 4. Get Connections
+**Functionality:** List accepted connections for the educator
+- **Endpoint:** `GET /api/collaboration/connections?role=educator`
+- **Response:** Array of connections with marketer info
+
+### Collaborator Dashboard (`/collaborator/:marketerId`)
+
+#### 5. Get Collaborator Context
+**Functionality:** Fetch shared context for this educator↔marketer pair
+- **Endpoint:** `GET /api/collaboration/:marketerId/context`
+- **Response:** `{ marketer: {...}, guidelines: {...}, sharedAssets: [...] }`
+
+#### 6. Create/Update Collaboration Course Draft
+**Functionality:** Save course metadata and modules for collaboration
+- **Endpoint:** `PUT /api/collaboration/:marketerId/course-draft`
+- **Request Body:**
+```json
+{
+  "title": "New Collaboration Course",
+  "description": "...",
+  "modules": [
+    { "id": "m1", "title": "Module 1", "description": "...", "duration": "45m" }
+  ]
+}
+```
+- **Response:** Saved draft with versioning `{ id, version, updatedAt }`
+
+#### 7. Upload Module Video (Draft)
+**Functionality:** Upload/replace video for a draft module
+- **Endpoint:** `POST /api/collaboration/:marketerId/course-draft/modules/:moduleId/video`
+- **Request:** multipart/form-data with video file
+- **Response:** `{ videoId, url, duration }`
+
+#### 8. Create Teaser
+**Functionality:** Generate a short teaser from a module
+- **Endpoint:** `POST /api/collaboration/:marketerId/teasers`
+- **Request Body:** `{ "moduleId": "m1", "style": "short" }`
+- **Response:** `{ id, title, status: "rendering"|"ready", url }`
+
+#### 9. List Teasers
+**Functionality:** List teaser videos created in this collaboration
+- **Endpoint:** `GET /api/collaboration/:marketerId/teasers`
+- **Response:** Array of teasers with status
+
+#### 10. Comment/Feedback on Draft
+**Functionality:** Add feedback on course draft or teaser
+- **Endpoint:** `POST /api/collaboration/:marketerId/feedback`
+- **Request Body:** `{ "target": "module|teaser|course", "targetId": "m1", "comment": "..." }`
+- **Response:** Feedback object with timestamps
+
+#### 11. Handoff to Course Creation
+**Functionality:** Convert collaboration draft into actual course
+- **Endpoint:** `POST /api/collaboration/:marketerId/convert-to-course`
+- **Response:** `{ courseId, status: "created" }`
+
 ## 👨‍🎓 STUDENT DASHBOARD API ENDPOINTS
 
 ### Dashboard Overview (`/dashboard/student`)
@@ -1060,4 +1139,4 @@ Content-Type: multipart/form-data
 
 ---
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-11-04

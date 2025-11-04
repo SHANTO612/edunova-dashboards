@@ -6,6 +6,7 @@
 3. [Marketer Functionality](#marketer-functionality)
 4. [AI Functionality](#ai-functionality)
 5. [Required APIs](#required-apis)
+6. [Collaboration Functionality](#collaboration-functionality)
 
 ---
 
@@ -283,6 +284,30 @@
   - Campaign optimization
 - Impact simulation
 - Action plans
+
+---
+
+## 🤝 Collaboration Functionality
+
+### Collaborate Page (`CollaboratePage`)
+- Discover marketers (list with search by name/specialization)
+- View incoming invitations from marketers
+- Accept invitation to create a connection
+- After acceptance, see a connection card with a button to open the Collaborator Dashboard
+
+### Collaborator Dashboard (`CollaboratorDashboard`)
+- Context: opened by educator for a specific marketer connection
+- Course content creation (inline):
+  - Course title and description
+  - Modules list: add/remove modules, edit title/duration/description
+  - Per-module video upload indicator
+- Video card:
+  - Create teaser video (dummy) from first module
+  - List teasers with rendering/ready statuses
+- Future (planned):
+  - Shared assets area (briefs, brand guidelines)
+  - Commenting/feedback on drafts
+  - Hand-off to full course creation flow
 
 ---
 
@@ -619,4 +644,4 @@ GET    /api/stats/bundles
 
 ---
 
-**Last Updated:** 2025-01-27
+**Last Updated:** 2025-11-04

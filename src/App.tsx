@@ -28,6 +28,8 @@ import StudentsPage from "./pages/StudentsPage";
 import TeachersPage from "./pages/TeachersPage";
 import AISuggestionsPage from "./pages/AISuggestionsPage";
 import NotFound from "./pages/NotFound";
+import CollaboratePage from "./pages/CollaboratePage";
+import CollaboratorDashboard from "./pages/dashboard/CollaboratorDashboard";
 
 const queryClient = new QueryClient();
 
@@ -152,6 +154,29 @@ const App = () => (
               <Route path="marketer" element={<TeachersPage />} />
             </Route>
             
+            <Route
+              path="/collaborate"
+              element={
+                <ProtectedRoute allowedRoles={['educator']}>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<CollaboratePage />} />
+              <Route path="educator" element={<CollaboratePage />} />
+            </Route>
+
+            <Route
+              path="/collaborator"
+              element={
+                <ProtectedRoute allowedRoles={['educator']}>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path=":marketerId" element={<CollaboratorDashboard />} />
+            </Route>
+
             <Route
               path="/ai-suggestions"
               element={

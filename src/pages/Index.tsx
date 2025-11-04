@@ -13,13 +13,17 @@ const ConnectivityAnimation = () => {
     { name: "Marketer", color: "hsl(var(--accent))", angle: 240 },
   ]
 
-  const radius = 60
-  const centerX = 100
-  const centerY = 100
+  const radius = 85
+  const centerX = 120
+  const centerY = 120
 
   return (
-    <div className="relative w-48 h-48">
-      <svg className="absolute inset-0" viewBox="0 0 200 200">
+    <motion.div
+      className="relative w-64 h-64"
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Number.POSITIVE_INFINITY, duration: 20, ease: "linear" }}
+    >
+      <svg className="absolute inset-0" viewBox="0 0 240 240">
         {/* Animated connecting lines */}
         {roles.map((role, idx) => {
           const nextRole = roles[(idx + 1) % roles.length]
@@ -48,7 +52,7 @@ const ConnectivityAnimation = () => {
         <motion.circle
           cx={centerX}
           cy={centerY}
-          r="8"
+          r="10"
           fill="hsl(var(--primary))"
           animate={{ scale: [1, 1.5, 1] }}
           transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
@@ -56,7 +60,7 @@ const ConnectivityAnimation = () => {
         <motion.circle
           cx={centerX}
           cy={centerY}
-          r="8"
+          r="10"
           fill="hsl(var(--primary))"
           opacity="0.3"
           animate={{ scale: [1, 2.5, 1] }}
@@ -72,10 +76,10 @@ const ConnectivityAnimation = () => {
         return (
           <motion.div
             key={role.name}
-            className="absolute w-12 h-12 rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold"
+            className="absolute w-14 h-14 rounded-full flex items-center justify-center text-primary-foreground text-xs font-bold"
             style={{
-              left: x - 24,
-              top: y - 24,
+              left: x - 28,
+              top: y - 28,
               backgroundColor: role.color,
             }}
             animate={{
@@ -87,7 +91,7 @@ const ConnectivityAnimation = () => {
           </motion.div>
         )
       })}
-    </div>
+    </motion.div>
   )
 }
 
@@ -192,16 +196,16 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-block mb-4 sm:mb-6 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-chart-5/10 border border-primary/20">
             <p className="text-sm font-medium bg-gradient-to-r from-primary to-chart-5 bg-clip-text text-transparent">
-              ✨ Transform Education with AI
+              ✨ AI-powered platform for effortless interactive learning
             </p>
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-foreground via-primary to-chart-5 bg-clip-text text-transparent">
-            The Future of Learning
+            Upload one video → Get notes, quizzes, flashcards, and courses
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
-            Empower students and teachers with intelligent collaboration, real-time engagement, and AI-driven insights
+            AI edits, summarizes, and builds interactive modules so teachers save time, students learn smarter, and institutes scale faster.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 px-4">
@@ -211,11 +215,11 @@ export default function Home() {
               className="bg-gradient-to-r from-primary to-chart-5 hover:opacity-90 text-primary-foreground border-0 transition-opacity"
             >
               <Link to="/login">
-                Start Free Trial <ArrowRight className="w-5 h-5 ml-2" />
+                Start Now <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>
             <Button size="lg" variant="outline">
-              Watch Demo
+              Book Demo
             </Button>
           </div>
 
@@ -235,6 +239,91 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Brand Purpose / Target Users / Core Value */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div className="grid gap-8 md:grid-cols-3">
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur">
+            <h3 className="text-xl font-bold mb-2">Brand Purpose</h3>
+            <p className="text-muted-foreground">
+              AI-powered platform that helps teachers create interactive learning modules effortlessly.
+            </p>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur">
+            <h3 className="text-xl font-bold mb-2">Target Users</h3>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 rounded-full border border-border text-sm">Coaching centers</span>
+              <span className="px-3 py-1 rounded-full border border-border text-sm">Teachers</span>
+              <span className="px-3 py-1 rounded-full border border-border text-sm">Students</span>
+            </div>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur">
+            <h3 className="text-xl font-bold mb-2">Core Value</h3>
+            <p className="text-muted-foreground">
+              Upload one video → AI edits, summarizes, creates notes, quizzes, flashcards, and full courses.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">Benefits</h2>
+        <div className="grid gap-6 sm:grid-cols-3">
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="text-lg font-semibold">Teachers save time</p>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="text-lg font-semibold">Students learn smarter</p>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="text-lg font-semibold">Institutes scale faster</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Problem */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">The Problem</h2>
+        <p className="text-muted-foreground text-center max-w-3xl mx-auto">
+          Teachers waste time on editing and content creation, students struggle to retain information, and institutes can’t scale personalized learning.
+        </p>
+      </section>
+
+      {/* Solution */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">The Solution</h2>
+        <p className="text-muted-foreground text-center max-w-3xl mx-auto">
+          AI handles editing, creates notes and quizzes, generates flashcards, and delivers smart recommendations.
+        </p>
+      </section>
+
+      {/* How It Works */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">How It Works</h2>
+        <div className="grid gap-6 sm:grid-cols-4">
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="font-semibold">Upload</p>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="font-semibold">AI builds</p>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="font-semibold">Students learn</p>
+          </div>
+          <div className="p-6 rounded-2xl border border-border/50 bg-card/50 backdrop-blur text-center">
+            <p className="font-semibold">Institutes grow</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Outcome */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">Outcome</h2>
+        <p className="text-muted-foreground text-center max-w-3xl mx-auto">
+          A modern, clear, and trustworthy learning ecosystem where everyone wins.
+        </p>
       </section>
 
       {/* Features Section */}
