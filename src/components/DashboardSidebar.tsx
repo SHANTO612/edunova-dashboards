@@ -60,6 +60,12 @@ const navItems: NavItem[] = [
     roles: ['educator', 'marketer'],
   },
   {
+    title: 'Teachers',
+    href: '/teachers',
+    icon: Users,
+    roles: ['marketer'],
+  },
+  {
     title: 'My Purchases',
     href: '/purchases',
     icon: ShoppingCart,
@@ -109,11 +115,7 @@ const DashboardSidebar = () => {
           );
         })}
       </nav>
-      <div className="mt-auto p-4 space-y-2">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium">Theme</span>
-          <ThemeToggle />
-        </div>
+      <div className="mt-auto p-4">
         <Button variant="outline" className="w-full" onClick={handleLogout}>
           <LogOut className="h-4 w-4 mr-2" />
           Logout

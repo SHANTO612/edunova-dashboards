@@ -25,6 +25,7 @@ import MarketerAnalytics from "./pages/analytics/MarketerAnalytics";
 import StudentAnalytics from "./pages/analytics/StudentAnalytics";
 import StudentPurchases from "./pages/purchases/StudentPurchases";
 import StudentsPage from "./pages/StudentsPage";
+import TeachersPage from "./pages/TeachersPage";
 import AISuggestionsPage from "./pages/AISuggestionsPage";
 import NotFound from "./pages/NotFound";
 
@@ -136,6 +137,19 @@ const App = () => (
             >
               <Route index element={<StudentsPage />} />
               <Route path="educator" element={<StudentsPage />} />
+              <Route path="marketer" element={<StudentsPage />} />
+            </Route>
+
+            <Route
+              path="/teachers"
+              element={
+                <ProtectedRoute allowedRoles={['marketer']}>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<TeachersPage />} />
+              <Route path="marketer" element={<TeachersPage />} />
             </Route>
             
             <Route
@@ -147,9 +161,9 @@ const App = () => (
               }
             >
               <Route index element={<AISuggestionsPage />} />
-              <Route path="educator" element={<AISuggestionsPage />} />
+              <Route path="marketer" element={<AISuggestionsPage />} />
               <Route path="student" element={<AISuggestionsPage />} />
-              <Route path="teacher" element={<AISuggestionsPage />} />
+              <Route path="educator" element={<AISuggestionsPage />} />
             </Route>
 
             <Route

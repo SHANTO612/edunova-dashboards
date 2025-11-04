@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { GraduationCap, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from './ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +24,10 @@ const Navbar = () => {
             <span>SynapseX</span>
           </Link>
 
-          {isAuthenticated ? (
-            <DropdownMenu>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            {isAuthenticated ? (
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2">
                   <User className="h-5 w-5" />
@@ -53,8 +56,8 @@ const Navbar = () => {
                   <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
+              </DropdownMenu>
+            ) : (
             <div className="flex gap-2">
               <Button variant="ghost" asChild>
                 <Link to="/login">Login</Link>
@@ -63,7 +66,8 @@ const Navbar = () => {
                 <Link to="/register">Get Started</Link>
               </Button>
             </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </nav>
